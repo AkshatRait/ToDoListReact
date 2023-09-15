@@ -1,48 +1,62 @@
-import { useState , useEffect} from 'react'
-import './styles.css'
-import ToDoList from './components/ToDoList'
+import TodoList from "./components/ToDoList"
+import "./styles.css"
+import { useState, useEffect } from "react"
 
-function App() {
-const [toDos, setToDos] = useState([]);
-const addToDo = (e) =>{
-  const newToDo = {text: e.target.value, id: Date.now(), completed: false };
-  setToDos([newToDo, ...toDos]);
-  e.target.value = "";
 
-}
-const completeToDo = (id , e) =>{
-  const toDosCopy = [...toDos];
-  const indexOfToDo = toDosCopy.findIndex((i) => i.id === id);
-  toDosCopy[indexOfToDo].completed = !toDosCopy[indexOfToDo].completed;
-  setToDos([...toDosCopy]);
-}
-const editToDoText = (id, e) => {
-  const toDosCopy = [...toDos]
-  const indexOfToDo = toDosCopy.findIndex((i) => i.id === id)
-  toDosCopy[indexOfToDo].text = e.target.value
-  setToDos([...toDosCopy])
-  e.target.value = ""
-}
+export default function App() {
+  const [todos, setTodos] = useState([]);
+  useEffect(() => {
+    const savedTodos = localStorage.getItem("todos")
+    if (savedTodos && savedTodos !== "undefined" && savedTodos !== "null") {
+      setTodos(JSON.parse(savedTodos))
+    }
+  }, [])
 
-const deleteToDo = (id) => {
-  const toDosCopy = [...toDos]
-  const indexOfToDo = toDosCopy.findIndex((i) => i.id === id)
-  toDosCopy.splice(indexOfToDo, 1)
-  setToDos([...toDosCopy])
-};
+  const addTodo = (e) => {
+    const newTodo = { text: e.target.value, id: Date.now(), completed: false }
+    localStorage.setItem("todos", JSON.stringify([newTodo, ...todos]))
+    setTodos([newTodo, ...todos])
+        localStorage.setItem("todos", JSON.stringify([newTodo, ...todos]))   
+    e.target.value = ""
+  }
+
+  const completeTodo = (id, e) => {
+    const todosCopy = [...todos]
+    const indexOfTodo = todosCopy.findIndex((i) => i.id === id)
+    todosCopy[indexOfTodo].completed = !todosCopy[indexOfTodo].completed
+    localStorage.setItem("todos", JSON.stringify([...todosCopy]))
+    setTodos([...todosCopy])
+  }
+
+  const editTodoText = (id, e) => {
+    const todosCopy = [...todos]
+    const indexOfTodo = todosCopy.findIndex((i) => i.id === id)
+    todosCopy[indexOfTodo].text = e.target.value
+    localStorage.setItem("todos", JSON.stringify([...todosCopy]))
+    setTodos([...todosCopy])
+    e.target.value = ""
+  }
+
+  const deleteTodo = (id) => {
+    const todosCopy = [...todos]
+    const indexOfTodo = todosCopy.findIndex((i) => i.id === id)
+    todosCopy.splice(indexOfTodo, 1)
+    localStorage.setItem(
+      "todos",
+      JSON.stringify([...todosCopy])
+    )
+    setTodos([...todosCopy])
+  };
+
   return (
-    <>
-      <div className="App">
-      <ToDoList
-        toDos={toDos}
-        addToDo={addToDo}
-        completeToDo={completeToDo}
-        editToDoText={editToDoText}
-        deleteToDo={deleteToDo}
+    <div className="App">
+      <TodoList
+        todos={todos}
+        addTodo={addTodo}
+        completeTodo={completeTodo}
+        editTodoText={editTodoText}
+        deleteTodo={deleteTodo}
       />
     </div>
-    </>
-  )
+  );
 }
-
-export default App
